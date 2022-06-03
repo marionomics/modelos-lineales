@@ -60,3 +60,6 @@ stargazer(modelo, modelo2, type = "text")
 stargazer(modelo, modelo2)
 
 
+ifelse(predict(modelo) < 0.07, 0, 1) %>%
+  mean()
+
