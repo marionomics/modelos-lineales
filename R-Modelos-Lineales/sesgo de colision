@@ -1,0 +1,37 @@
+
+set.seed(42)
+
+#####creamos la tabla inicial
+diccionario <- data.frame(
+  "female" = rbinom(10000,1,0.5), 
+  "ability" = rnorm(10000) 
+)
+
+
+
+df<- diccionario
+#####agregamos una variable discriminacion dublicando el contenido de la variable female
+df$discrimination<-df$female
+
+#creamos el resto de las variables duplicando la formulas vista en python
+df$ocupation<- 1+(df$ability*2)+df$female-(df$discrimination*2)+rnorm(10000)
+df$wage<- df$discrimination+df$ocupation+df$ability+rnorm(10000)
+head(df)
+
+
+#Creamos los tres modelos
+
+modelo1 <- lm(wage~discrimination,data=df)
+summary(modelo1)
+
+modelo2 <- lm(wage~discrimination+ocupation,data=df)
+summary(modelo2)
+
+modelo3 <- lm(wage~discrimination+ocupation+ability,data=df)
+summary(modelo3)
+
+
+####creamos la tabla de comparacion
+stargazer(modelo1, modelo2, modelo3, type = "text")
+
+####lo interesande de estos tres modelos con esta semilla es ver como en el ultimo modelo B0 pierde importancia
