@@ -66,9 +66,13 @@ run_cluster_sim <- function(n_sims = 1000,
     }
 
 
+# Distribucion de los parametros e intervalos de confianza
 sim_params <- c(.4, 0)   # beta1 = 0: no effect of x on y
 sim_nocluster <- run_cluster_sim(n_sims = 10000, param = sim_params, rho = 0)
 hist_nocluster <- ggplot(sim_nocluster, aes(b1)) +
   geom_histogram(color = 'black') +
   geom_vline(xintercept = sim_params[2], color = 'red')
 print(hist_nocluster)
+
+ci95_nocluster <- ggplot(sample_n(sim_nocluster, 100),
+                        aes(x = reorder(id, b1), y = b1))
