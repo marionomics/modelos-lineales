@@ -75,4 +75,39 @@ hist_nocluster <- ggplot(sim_nocluster, aes(b1)) +
 print(hist_nocluster)
 
 ci95_nocluster <- ggplot(sample_n(sim_nocluster, 100),
-                        aes(x = reorder(id, b1), y = b1))
+                        aes(x = reorder(id, b1), y = b1,
+                        ymin = ci95_lower, ymax = ci95_upper,
+                        color = param_caught))+
+                        geom_hline(yintercept = sim_params[2], linetype = 'dashed')+
+                        geom_pointrange()+
+                        labs(x = 'ID de simulacion',
+                            y = 'b1', title = "100 simulaciones al 95% IC")+
+                        scale_color_discrete(name = "Valor de parametro verdadero",
+                                            labels = c("Fallaste", "Le diste"))+
+                        coord_flip()
+print(ci95_nocluster)
+
+#----------------------------------------------------
+# Datos con clusters
+sim_params <- c(0.4, 0)
+sim_ols_cluster <- run_cluster_sim(n_sims = 10000,
+                                param = sim_params)
+hist_ols_cluster <- hist_nocluster %+% sim_ols_cluster
+print(hist_ols_cluster)
+
+ci95_cluster_ols <- ci95_nocluster %+% sample_n(sim_ols_cluster, 100)
+print(ci95_cluster_ols)
+
+# -------------------------------------------------
+# Cluster robust
+
+sim_params <- c(0.4, 0)
+sim_cluster_robust <- run_cluster_sim(n_sims = 10000,
+                                    param = sim_params,
+                                    cluster_robust = TRUE)
+
+hist_cluster_robust <- hist_nocluster %+% sim_ols_cluster
+print(hist_cluster_robust)
+
+ci95_cluster_robust <- ci95_nocluster %+% sample_n(sim_cluster_robust, 100)
+print(ci95_cluster_robust)
