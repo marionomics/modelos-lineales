@@ -1,6 +1,8 @@
 # Libraries
 library(mvtnorm)
 library(multiwayvcov)
+library(dplyr)
+library(ggplot2)
 
 create_cluster <- function(rho = 0.5, n = 1000,
 n_cluster = 50, param = c(0.1, 0.5)){
@@ -23,8 +25,12 @@ n_cluster = 50, param = c(0.1, 0.5)){
 }
 
 # Simulate clustered dataset and fit with OLS
-cluster_sim <- function(param = c(0.1, 0.5), cluster_robust = FALSE){
-    df <- create_cluster(param = param)
+cluster_sim <- function(param = c(0.1, 0.5),
+                        cluster_robust = FALSE,
+                        n = 1000,
+                        rho = 0.5,
+                        n_cluster = 50){
+    df <- create_cluster(param = param, rho = rho)
     model <- lm(y ~ x, data = df)
     b1 <- coef(model)[2]
     if(!cluster_robust){
@@ -41,5 +47,28 @@ cluster_sim <- function(param = c(0.1, 0.5), cluster_robust = FALSE){
     }
     return(c(b1, se, b1_ci95))
 }
-cluster_sim(cluster_robust = FALSE)
 
+
+# Iterate the simulation
+run_cluster_sim <- function(n_sims = 1000,
+    param = c(0.1, 0.5),
+    cluster_robust = FALSE,
+    rho = 0.5){
+        # Required packages: mvtnorm, multiwayvcov, dplyr
+        df <- replicate(n_sims,
+         cluster_sim(cluster_robust = cluster_robust, param = param, rho = rho))
+        df <- as.data.frame(t(df))
+        names(df) <- c('b1', 'se_b1', 'ci95_lower', 'ci95_upper')
+        df <- df %>%
+            mutate(id = 1:n(),
+                param_caught = ci95_lower <= param[2] & ci95_upper >= param[2])
+        return(df)
+    }
+
+
+sim_params <- c(.4, 0)   # beta1 = 0: no effect of x on y
+sim_nocluster <- run_cluster_sim(n_sims = 10000, param = sim_params, rho = 0)
+hist_nocluster <- ggplot(sim_nocluster, aes(b1)) +
+  geom_histogram(color = 'black') +
+  geom_vline(xintercept = sim_params[2], color = 'red')
+print(hist_nocluster)
