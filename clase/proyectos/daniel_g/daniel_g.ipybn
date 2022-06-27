@@ -1,0 +1,16 @@
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+df = pd.read_csv(r'C:\Users\Daniel\OneDrive\Documentos\MAEA\Primer Semestre\Modelos lineales\student_data.csv')
+
+df.head()
+
+df['meang'] = df['G1'] + df['G2'] + df['G3'] / 3
+
+df.head()
+
+model1 = sm.OLS.from_formula('meang ~ sex + Medu + Mjob + studytime + failures + schoolsup + famsup + higher + romantic + goout + health', data = df)
+
+model1.fit().summary()
