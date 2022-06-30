@@ -1,6 +1,8 @@
 # Acordeón para revisar supuestos en MCO
 
-En este texto explicaremos como hacer las pruebas de los supuestos del modelo de mínimos cuadrados ordinarios.
+En este texto explicaremos como hacer las pruebas de los supuestos del modelo de mínimos cuadrados ordinarios. Para hacerlo, usaremos un modelo sencillo con una de las bases de datos que vienen ya pre-cargadas en R: `mtcars`.
+
+La base de `mtcars` contiene información de automóviles que incluye su rendimiento en millas por galón de gasolina, 
 
 ```
 model <- lm(mpg ~ wt + disp + qsec, data = mtcars)
@@ -19,3 +21,6 @@ plot(model)
 ## Relación lineal
 
 Revisamos los valores observados contra la prediccion
+
+## Normalidad de los residuales
+
